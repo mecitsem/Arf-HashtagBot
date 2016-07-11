@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace Arf.Core
 {
-    public class Class1
+    public abstract partial class BaseService
     {
+        public string SubscriptionKey { get; set; }
     }
 }
