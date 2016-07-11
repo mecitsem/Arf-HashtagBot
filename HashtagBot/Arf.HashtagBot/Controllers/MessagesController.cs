@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
+using Arf.Services;
 using Microsoft.Bot.Connector;
 using Newtonsoft.Json;
 
@@ -21,12 +22,20 @@ namespace Arf.HashtagBot
         {
             if (activity.Type == ActivityTypes.Message)
             {
-                ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
+                var connector = new ConnectorClient(new Uri(activity.ServiceUrl));
                 // calculate something for us to return
-                int length = (activity.Text ?? string.Empty).Length;
+                var length = (activity.Text ?? string.Empty).Length;
+                if (length == 0) return null;
+                var imgPath = activity.Text;
+                var isUpload = imgPath != null && !imgPath.StartsWith("http");
+
+                var service = new VisionService();
+                var analysisResult = isUpload
+                    ? await service.UploadAndDescripteImage(imgPath)
+                    : await service.DescripteUrl(imgPath);
 
                 // return our reply to the user
-                Activity reply = activity.CreateReply($"You sent {activity.Text} which was {length} characters");
+                var reply = activity.CreateReply(string.Join(" ", analysisResult.Description.Tags.Select(s => s = "#" + s)));
                 await connector.Conversations.ReplyToActivityAsync(reply);
             }
             else
