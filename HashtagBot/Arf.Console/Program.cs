@@ -39,7 +39,7 @@ namespace Arf.Console
                 : await service.DescripteUrl(imgPath);
 
             System.Console.ForegroundColor = ConsoleColor.DarkGreen;
-            System.Console.WriteLine(string.Join(" ", analysisResult.Description.Tags.Select(s => s = "#" + s)));
+            System.Console.WriteLine(string.Join(" ", analysisResult.Description.Tags.Select(s => $"#{s}")));
             System.Console.ResetColor();
             IsProcessing = false;
         }
