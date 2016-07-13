@@ -26,7 +26,7 @@ namespace Arf.HashtagBot
                 // calculate something for us to return
                 var length = (activity.Text ?? string.Empty).Length;
                 if (length == 0) return null;
-                var imgPath = activity.Text;
+                var imgPath = activity.Attachments.Count > 0 ? activity.Attachments.FirstOrDefault().ContentUrl : activity.Text;
                 var isUpload = imgPath != null && !imgPath.StartsWith("http");
 
                 var service = new VisionService();
