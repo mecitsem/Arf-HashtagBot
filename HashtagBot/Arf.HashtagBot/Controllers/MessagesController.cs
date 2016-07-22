@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http;
 using System.Web.Http.Description;
 using Arf.Services;
@@ -20,29 +21,45 @@ namespace Arf.HashtagBot
         /// </summary>
         public async Task<HttpResponseMessage> Post([FromBody]Activity activity)
         {
-            if (activity.Type == ActivityTypes.Message)
+            HttpResponseMessage response;
+            var connector = new ConnectorClient(new Uri(activity.ServiceUrl));
+            try
             {
-                var connector = new ConnectorClient(new Uri(activity.ServiceUrl));
-                // calculate something for us to return
-                var length = (activity.Text ?? string.Empty).Length;
-                if (length == 0) return null;
-                var imgPath = activity.Attachments.Count > 0 ? activity.Attachments.FirstOrDefault().ContentUrl : activity.Text;
-                var isUpload = imgPath != null && !imgPath.StartsWith("http");
 
-                var service = new VisionService();
-                var analysisResult = isUpload
-                    ? await service.UploadAndDescripteImage(imgPath)
-                    : await service.DescripteUrl(imgPath);
+                if (activity.Type.ToLowerInvariant().Equals(ActivityTypes.Message.ToLowerInvariant()))
+                {
 
-                // return our reply to the user
-                var reply = activity.CreateReply(string.Join(" ", analysisResult.Description.Tags.Select(s => s = "#" + s)));
+
+                    //// calculate something for us to return
+                    var length = (activity.Text ?? string.Empty).Length;
+                    if (length == 0) return null;
+                    var imgPath = activity.Attachments != null && activity.Attachments.Count > 0 ? activity.Attachments.First().ContentUrl : activity.Text;
+                    var isUpload = imgPath != null && !imgPath.StartsWith("http");
+
+                    //var reply1 = activity.CreateReply(imgPath);
+                    //await connector.Conversations.ReplyToActivityAsync(reply1);
+                    var service = new VisionService();
+                    var analysisResult = isUpload
+                        ? await service.UploadAndDescripteImage(imgPath)
+                        : await service.DescripteUrl(imgPath);
+
+
+                    var reply2 = activity.CreateReply(string.Join(" ", analysisResult.Description.Tags.Select(s => "#" + s)));
+                    await connector.Conversations.ReplyToActivityAsync(reply2);
+                }
+                else
+                {
+                    HandleSystemMessage(activity);
+                }
+                response = Request.CreateResponse(HttpStatusCode.Accepted);
+            }
+            catch (Exception ex)
+            {
+                var reply = activity.CreateReply($"Error : '{ex.Message}'");
                 await connector.Conversations.ReplyToActivityAsync(reply);
+                response = Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex);
             }
-            else
-            {
-                HandleSystemMessage(activity);
-            }
-            var response = Request.CreateResponse(HttpStatusCode.OK);
+
             return response;
         }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Arf.Services.Common;
 
 namespace Arf.Services.Helpers
 {
@@ -10,7 +11,7 @@ namespace Arf.Services.Helpers
     {
         public static string GetSubscriptionKey()
         {
-            return "";
+            return ConfigurationHelper.GetAppSettingsValue(Constants.AppSettingsKey.SubscriptionKey);
         }
     }
 }
