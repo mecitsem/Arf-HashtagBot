@@ -28,24 +28,23 @@ namespace Arf.HashtagBot
 
                 if (activity.Type.ToLowerInvariant().Equals(ActivityTypes.Message.ToLowerInvariant()))
                 {
-
-
-                    //// calculate something for us to return
-                    var length = (activity.Text ?? string.Empty).Length;
-                    if (length == 0) return null;
+                    //Get Image Path
                     var imgPath = activity.Attachments != null && activity.Attachments.Count > 0 ? activity.Attachments.First().ContentUrl : activity.Text;
+
+                    if (string.IsNullOrEmpty(imgPath)) throw new ArgumentNullException("ImgPath is null");
+
                     var isUpload = imgPath != null && !imgPath.StartsWith("http");
 
-                    //var reply1 = activity.CreateReply(imgPath);
-                    //await connector.Conversations.ReplyToActivityAsync(reply1);
+                    //Microsoft Vision Service API
                     var service = new VisionService();
+
                     var analysisResult = isUpload
                         ? await service.UploadAndDescripteImage(imgPath)
                         : await service.DescripteUrl(imgPath);
 
+                    var reply = activity.CreateReply("ArfHashtagBot Tags: " + string.Join(" ", analysisResult.Description.Tags.Select(s => "#" + s)));
 
-                    var reply2 = activity.CreateReply(string.Join(" ", analysisResult.Description.Tags.Select(s => "#" + s)));
-                    await connector.Conversations.ReplyToActivityAsync(reply2);
+                    await connector.Conversations.ReplyToActivityAsync(reply);
                 }
                 else
                 {
