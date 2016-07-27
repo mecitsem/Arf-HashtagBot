@@ -15,51 +15,91 @@ namespace Arf.HashtagBot
     [BotAuthentication]
     public class MessagesController : ApiController
     {
+
+
         /// <summary>
         /// POST: api/Messages
         /// Receive a message from a user and reply to it
         /// </summary>
         public async Task<HttpResponseMessage> Post([FromBody]Activity activity)
         {
-            HttpResponseMessage response;
+            //HttpResponseMessage response;
             var connector = new ConnectorClient(new Uri(activity.ServiceUrl));
             try
             {
 
                 if (activity.Type.ToLowerInvariant().Equals(ActivityTypes.Message.ToLowerInvariant()))
                 {
-                    //Get Image Path
-                    var imgPath = activity.Attachments != null && activity.Attachments.Count > 0 ? activity.Attachments.First().ContentUrl : activity.Text;
+                    string imgPath = string.Empty;
+                    bool isUpload = false;
 
-                    if (string.IsNullOrEmpty(imgPath)) throw new ArgumentNullException("ImgPath is null");
+                    Relpy(connector, activity, "I'm working on it. Please wait!");
 
-                    var isUpload = imgPath != null && !imgPath.StartsWith("http");
+                    if (activity.Attachments != null && activity.Attachments.Count > 0)
+                    {
+                        imgPath = activity.Attachments.First().ContentUrl;
+                    }
+                    else if (string.IsNullOrEmpty(activity.Text))
+                    {
+                        imgPath = activity.Text.StartsWith("http") || activity.Text.StartsWith("https") ? activity.Text : string.Empty;
+                    }
 
-                    //Microsoft Vision Service API
-                    var service = new VisionService();
+                    //Check ImagePath
+                    if (string.IsNullOrEmpty(imgPath))
+                    {
+                        Relpy(connector, activity, "I'm sorry this isn't Image or ImageUrl.");
+                    }
+                    else
+                    {
+                        //Microsoft Vision Service API
+                        var service = new VisionService();
 
-                    var analysisResult = isUpload
-                        ? await service.UploadAndDescripteImage(imgPath)
-                        : await service.DescripteUrl(imgPath);
+                        //Working Message
+                        //Relpy(connector, activity, "Almost done!");
 
-                    var reply = activity.CreateReply("ArfHashtagBot Tags: " + string.Join(" ", analysisResult.Description.Tags.Select(s => "#" + s)));
+                        var analysisResult = isUpload
+                            ? await service.UploadAndDescripteImage(imgPath)
+                            : await service.DescripteUrl(imgPath);
 
-                    await connector.Conversations.ReplyToActivityAsync(reply);
+                        //Send Succcess Message
+                        Relpy(connector, activity, $"Here you go! Hmmm. Let me think about that {analysisResult.Description.Captions.FirstOrDefault().Text}. :)");
+
+                        var reply = activity.CreateReply("Tags: " + string.Join(" ", analysisResult.Description.Tags.Select(s => "#" + s)));
+
+                        await connector.Conversations.ReplyToActivityAsync(reply);
+                    }
                 }
                 else
                 {
                     HandleSystemMessage(activity);
                 }
-                response = Request.CreateResponse(HttpStatusCode.Accepted);
+                //response = Request.CreateResponse(HttpStatusCode.Accepted);
             }
             catch (Exception ex)
             {
-                var reply = activity.CreateReply($"Error : '{ex.Message}'");
-                await connector.Conversations.ReplyToActivityAsync(reply);
-                response = Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex);
+                RelpyAsync(connector, activity, "Something went wrong. Please try again!");
+                //response = Request.CreateResponse(HttpStatusCode.Accepted);
             }
 
-            return response;
+            return Request.CreateResponse(HttpStatusCode.Accepted);
+        }
+
+        private async void RelpyAsync(ConnectorClient connector, Activity activity, string message)
+        {
+            if (connector != null && activity != null && !string.IsNullOrEmpty(activity.Id))
+            {
+                var reply = activity.CreateReply(message);
+                await connector.Conversations.ReplyToActivityAsync(reply);
+            }
+        }
+
+        private void Relpy(ConnectorClient connector, Activity activity, string message)
+        {
+            if (connector != null && activity != null && !string.IsNullOrEmpty(activity.Id))
+            {
+                var reply = activity.CreateReply(message);
+                connector.Conversations.ReplyToActivity(reply);
+            }
         }
 
         private Activity HandleSystemMessage(Activity message)
