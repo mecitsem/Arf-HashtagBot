@@ -153,7 +153,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\Images\arf_hashtag_bot_screen.png" />
+    <Content Include="Content\Images\snip_20160729142515.png" />
     <Content Include="default.htm" />
     <Content Include="Global.asax" />
     <Content Include="scripts\ai.0.15.0-build58334.js" />
