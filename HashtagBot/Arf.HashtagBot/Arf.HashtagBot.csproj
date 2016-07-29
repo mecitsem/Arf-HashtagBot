@@ -154,6 +154,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\Images\arf_hashtag_bot_telegram_screenshot.png" />
+    <Content Include="Content\Images\facebook_screenshot.jpg" />
+    <Content Include="Content\Images\telegram_screenshot.jpg" />
     <Content Include="default.htm" />
     <Content Include="Global.asax" />
     <Content Include="scripts\ai.0.15.0-build58334.js" />
