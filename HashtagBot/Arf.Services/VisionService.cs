@@ -37,6 +37,19 @@ namespace Arf.Services
             }
         }
 
+        public async Task<AnalysisResult> UploadAndDescripteImage(byte[] content)
+        {
+            // Create Project Oxford Vision API Service client
+            var visionServiceClient = new VisionServiceClient(SubscriptionKey);
+
+            using (Stream imageFileStriStream = new MemoryStream(content))
+            {
+                // Upload and image and request three descriptions
+                var analysisResult = await visionServiceClient.DescribeAsync(imageFileStriStream, 3);
+                return analysisResult;
+            }
+        }
+
         public async Task<AnalysisResult> DescripteUrl(string imageUrl)
         {
             var visionServiceClient = new VisionServiceClient(SubscriptionKey);

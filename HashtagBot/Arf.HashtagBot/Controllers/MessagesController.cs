@@ -9,6 +9,7 @@ using System.Web.Http.Description;
 using Arf.Services;
 using Microsoft.Bot.Connector;
 using Newtonsoft.Json;
+using System.Net.Http.Headers;
 
 namespace Arf.HashtagBot
 {
@@ -30,24 +31,47 @@ namespace Arf.HashtagBot
 
                 if (activity.Type.ToLowerInvariant().Equals(ActivityTypes.Message.ToLowerInvariant()))
                 {
-                    string imgPath = string.Empty;
+                    string imgUrl = string.Empty;
                     bool isUpload = false;
-
+                    byte[] attachmentData = null;
                     Relpy(connector, activity, "I'm working on it. Please wait!");
 
-                    if (activity.Attachments != null && activity.Attachments.Count > 0)
+                    var attachment = activity.Attachments?.FirstOrDefault();
+
+                    if (attachment?.ContentUrl != null)
                     {
-                        imgPath = activity.Attachments.First().ContentUrl;
+                        //imgPath = activity.Attachments?.First().ContentUrl;
+                        //isUpload = true;
+
+                        //For skype
+                        var token = await (connector.Credentials as MicrosoftAppCredentials).GetTokenAsync();
+                        var uri = new Uri(attachment.ContentUrl);
+                        using (var httpClient = new HttpClient())
+                        {
+                            if (uri.Host.EndsWith("skype.com") && uri.Scheme == Uri.UriSchemeHttps)
+                            {
+                                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/octet-stream"));
+                            }
+                            else
+                            {
+                                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(attachment.ContentType));
+                            }
+
+                            attachmentData = await httpClient.GetByteArrayAsync(uri);
+                            isUpload = attachmentData != null;
+                        }
+
                     }
                     else if (string.IsNullOrEmpty(activity.Text))
                     {
-                        imgPath = activity.Text.StartsWith("http") || activity.Text.StartsWith("https") ? activity.Text : string.Empty;
+                        imgUrl = activity.Text.StartsWith("http") || activity.Text.StartsWith("https") ? activity.Text : string.Empty;
                     }
 
                     //Check ImagePath
-                    if (string.IsNullOrEmpty(imgPath))
+                    if (!isUpload && string.IsNullOrEmpty(imgUrl))
                     {
-                        Relpy(connector, activity, "I'm sorry this isn't Image or ImageUrl.");
+                        Relpy(connector, activity, "I'm sorry this isn't Image or ImageUrl or doesn't support this format.");
                     }
                     else
                     {
@@ -57,12 +81,11 @@ namespace Arf.HashtagBot
                         //Working Message
                         //Relpy(connector, activity, "Almost done!");
 
-                        var analysisResult = isUpload
-                            ? await service.UploadAndDescripteImage(imgPath)
-                            : await service.DescripteUrl(imgPath);
+                        var analysisResult = isUpload ? await service.UploadAndDescripteImage(attachmentData)
+                                                      : await service.DescripteUrl(imgUrl);
 
                         //Send Succcess Message
-                        Relpy(connector, activity, $"Here you go! Hmmm. Let me think about that {analysisResult.Description.Captions.FirstOrDefault().Text}. :)");
+                        Relpy(connector, activity, $"Here you go! Hmmm. Let me think about that {analysisResult.Description?.Captions?.FirstOrDefault()?.Text}. :)");
 
                         var reply = activity.CreateReply("Tags: " + string.Join(" ", analysisResult.Description.Tags.Select(s => "#" + s)));
 
@@ -77,14 +100,17 @@ namespace Arf.HashtagBot
             }
             catch (Exception ex)
             {
-                RelpyAsync(connector, activity, "Something went wrong. Please try again!");
+                await RelpyAsync(connector, activity, "Something went wrong. Please try again!");
                 //response = Request.CreateResponse(HttpStatusCode.Accepted);
             }
-
+            finally
+            {
+                connector.Dispose();
+            }
             return Request.CreateResponse(HttpStatusCode.Accepted);
         }
 
-        private async void RelpyAsync(ConnectorClient connector, Activity activity, string message)
+        private async Task RelpyAsync(ConnectorClient connector, Activity activity, string message)
         {
             if (connector != null && activity != null && !string.IsNullOrEmpty(activity.Id))
             {
