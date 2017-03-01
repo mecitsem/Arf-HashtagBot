@@ -1,6 +1,6 @@
 # ARF Hashtag Bot
 Hashtag generator via your related image.
-When your upload image or send image url, it generate tags for your image. Channels Telegram, Facebook, Skype
+When you upload image or send image url, it generate tags.This bot works on Telegram, Facebook, Skype channels.
 
 <h4>Telegram Bot : @ArfHashtagBot</h4>
 <table>
