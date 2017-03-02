@@ -11,7 +11,7 @@ Send a photo and generate auto hashtag for your photos with this bot on Facebook
 <table>
 <tr>
     <td>
-        <img src="https://github.com/mecitsem/Arf-HashtagBot/blob/master/HashtagBot/Arf.HashtagBot/Content/Images/arfbot_telegram.gif">
+        <img src="http://www.mecitsemerci.com/wp-content/uploads/2017/03/arfbot_telegram_animation.gif">
     </td>
 </tr>
 <table>
@@ -33,9 +33,9 @@ Send a photo and generate auto hashtag for your photos with this bot on Facebook
 <th>Skype(coming soon)</th>
 </tr>
     <tr>
-    <td><img src="https://github.com/mecitsem/hashtagbot/blob/master/HashtagBot/Arf.HashtagBot/Content/Images/facebook_screenshot.jpg" width="292"></td>
-    <td><img src="https://github.com/mecitsem/hashtagbot/blob/master/HashtagBot/Arf.HashtagBot/Content/Images/telegram_screenshot.jpg" width="292"></td>
-    <td><img src="https://github.com/mecitsem/Arf-HashtagBot/blob/master/HashtagBot/Arf.HashtagBot/Content/Images/skype_screenshot.jpg" width="292" /></td>
+    <td><img src="http://www.mecitsemerci.com/wp-content/uploads/2017/03/facebook_screenshot.jpg" width="292"></td>
+    <td><img src="http://www.mecitsemerci.com/wp-content/uploads/2017/03/telegram_screenshot.jpg" width="292"></td>
+    <td><img src="http://www.mecitsemerci.com/wp-content/uploads/2017/03/skype_screenshot.jpg" width="292" /></td>
     </tr>
 </table>
 
