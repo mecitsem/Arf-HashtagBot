@@ -30,7 +30,7 @@ Send a photo and generate auto hashtag for your photos with this bot on Facebook
 <tr>
 <th>Facebook(coming soon)</th>
 <th>Telegram(online)</th>
-<th>Skype(comming soon)</th>
+<th>Skype(coming soon)</th>
 </tr>
     <tr>
     <td><img src="https://github.com/mecitsem/hashtagbot/blob/master/HashtagBot/Arf.HashtagBot/Content/Images/facebook_screenshot.jpg" width="292"></td>
