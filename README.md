@@ -21,7 +21,7 @@ Send a photo and generate auto hashtag for your photos with this bot on Facebook
 <ul>
 <li>Facebook Messenger(coming soon) </li>
 <li>Telegram</li>
-<li>Skype(comming soon)</li>
+<li>Skype(coming soon)</li>
 </ul>
 <table>
 <tr>
