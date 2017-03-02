@@ -153,6 +153,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\Images\arfbot_telegram.gif" />
     <Content Include="Content\Images\arf_hashtag_bot_telegram_screenshot.png" />
     <Content Include="Content\Images\facebook_screenshot.jpg" />
     <Content Include="Content\Images\facebook_telegram_mobile.png" />
