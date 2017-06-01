@@ -30,7 +30,7 @@ Send a photo and generate auto hashtag for your photos with this bot on Facebook
 <tr>
 <th>Facebook(coming soon)</th>
 <th>Telegram(online)</th>
-<th>Skype(coming soon)</th>
+<th>Skype(online)</th>
 </tr>
     <tr>
     <td><img src="http://www.mecitsemerci.com/wp-content/uploads/2017/03/facebook_screenshot.jpg" width="292"></td>
