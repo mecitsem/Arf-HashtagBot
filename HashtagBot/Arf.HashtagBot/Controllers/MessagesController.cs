@@ -48,7 +48,7 @@ namespace Arf.HashtagBot
                         var uri = new Uri(attachment.ContentUrl);
                         using (var httpClient = new HttpClient())
                         {
-                            if (uri.Host.EndsWith("skype.com") && uri.Scheme == Uri.UriSchemeHttps)
+                            if (uri.Host.EndsWith("skype.com", StringComparison.Ordinal) && uri.Scheme == Uri.UriSchemeHttps)
                             {
                                 httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/octet-stream"));
@@ -65,7 +65,7 @@ namespace Arf.HashtagBot
                     }
                     else if (string.IsNullOrEmpty(activity.Text))
                     {
-                        imgUrl = activity.Text.StartsWith("http") || activity.Text.StartsWith("https") ? activity.Text : string.Empty;
+                        imgUrl = activity.Text.StartsWith("http", StringComparison.Ordinal) || activity.Text.StartsWith("https", StringComparison.Ordinal) ? activity.Text : string.Empty;
                     }
 
                     //Check ImagePath
